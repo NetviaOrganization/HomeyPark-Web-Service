@@ -3,6 +3,7 @@ package Netvia.SwapServiceAPI.iam.domain.model.aggregates;
 import Netvia.SwapServiceAPI.iam.domain.model.entities.Role;
 import Netvia.SwapServiceAPI.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -29,6 +30,11 @@ public class User extends AuditableAbstractAggregateRoot<User> {
   private String username;
 
   @NotBlank
+  @Email
+  @Column(unique = true)
+  private String email;
+
+  @NotBlank
   @Size(max = 120)
   private String password;
 
@@ -41,14 +47,15 @@ public class User extends AuditableAbstractAggregateRoot<User> {
   public User() {
     this.roles = new HashSet<>();
   }
-  public User(String username, String password) {
+  public User(String email, String username, String password) {
+    this.email = email;
     this.username = username;
     this.password = password;
     this.roles = new HashSet<>();
   }
 
-  public User(String username, String password, List<Role> roles) {
-    this(username, password);
+  public User(String email, String username, String password, List<Role> roles) {
+    this(email, username, password);
     addRoles(roles);
   }
 

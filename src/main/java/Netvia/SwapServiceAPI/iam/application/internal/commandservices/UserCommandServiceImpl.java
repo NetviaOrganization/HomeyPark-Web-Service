@@ -5,6 +5,8 @@ import Netvia.SwapServiceAPI.iam.application.internal.outboundservices.tokens.To
 import Netvia.SwapServiceAPI.iam.domain.model.aggregates.User;
 import Netvia.SwapServiceAPI.iam.domain.model.commands.SignInCommand;
 import Netvia.SwapServiceAPI.iam.domain.model.commands.SignUpCommand;
+import Netvia.SwapServiceAPI.iam.domain.model.entities.Role;
+import Netvia.SwapServiceAPI.iam.domain.model.valueobjects.Roles;
 import Netvia.SwapServiceAPI.iam.domain.services.UserCommandService;
 import Netvia.SwapServiceAPI.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import Netvia.SwapServiceAPI.iam.infrastructure.persistence.jpa.repositories.UserRepository;
@@ -12,6 +14,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import java.util.List;
 
 /**
  * User command service implementation
@@ -71,12 +75,18 @@ public class UserCommandServiceImpl implements UserCommandService {
   public Optional<User> handle(SignUpCommand command) {
     if (userRepository.existsByUsername(command.username()))
       throw new RuntimeException("Username already exists");
+    if (userRepository.existsByEmail(command.email()))
+      throw new RuntimeException("Email already exists");
     var roles = command.roles().stream()
         .map(role ->
             roleRepository.findByName(role.getName())
                 .orElseThrow(() -> new RuntimeException("Role name not found")))
         .toList();
-    var user = new User(command.username(), hashingService.encode(command.password()), roles);
+    if (roles.isEmpty()) {
+      roles = List.of(roleRepository.findByName(Roles.ROLE_USER)
+              .orElseThrow(() -> new RuntimeException("Default role not found")));
+    }
+    var user = new User(command.email(), command.username(), hashingService.encode(command.password()), roles);
     userRepository.save(user);
     return userRepository.findByUsername(command.username());
   }
