@@ -16,8 +16,7 @@ import java.util.Optional;
 @Service
 public class ParkingQueryService implements IParkingQueryService {
     private final IParkingRepository parkingRepository;
-
-
+    
     public ParkingQueryService(IParkingRepository parkingRepository) {
         this.parkingRepository = parkingRepository;
     }

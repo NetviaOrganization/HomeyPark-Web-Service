@@ -14,6 +14,6 @@ public record UpdateParkingResource(
         String district,
         String city,
         String coordinates,
-        String latitude,
-        String longitude) {
+        Double latitude,
+        Double longitude) {
 }

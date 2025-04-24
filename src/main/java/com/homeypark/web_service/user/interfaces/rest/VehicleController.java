@@ -8,6 +8,7 @@ import com.homeypark.web_service.user.domain.model.entities.User;
 import com.homeypark.web_service.user.domain.model.queries.GetAllVehiclesQuery;
 import com.homeypark.web_service.user.domain.model.queries.GetUserByIdQuery;
 import com.homeypark.web_service.user.domain.model.queries.GetVehicleByIdQuery;
+import com.homeypark.web_service.user.domain.model.queries.GetVehiclesByUserIdQuery;
 import com.homeypark.web_service.user.interfaces.rest.resources.CreateVehicleResource;
 import com.homeypark.web_service.user.interfaces.rest.resources.UpdateVehicleResource;
 import com.homeypark.web_service.user.interfaces.rest.transformers.CreateVehicleCommandFromResourceAssembler;
@@ -40,6 +41,17 @@ public class VehicleController {
 
         return user.map(u -> new ResponseEntity<>(u, HttpStatus.OK)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<Vehicle>> getVehiclesByUserId(@PathVariable Long id) {
+        var getVehiclesByUserIdQuery = new GetVehiclesByUserIdQuery(id);
+
+        var vehicleList = vehicleQueryService.handle(getVehiclesByUserIdQuery);
+
+        return new ResponseEntity<>(vehicleList, HttpStatus.OK);
+    }
+
 
 
     @PostMapping("/create")

@@ -1,13 +1,10 @@
 package com.homeypark.web_service.parkings.domain.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.homeypark.web_service.parkings.domain.model.aggregates.Location;
 import com.homeypark.web_service.parkings.domain.model.aggregates.Schedule;
 import com.homeypark.web_service.parkings.domain.model.commands.CreateParkingCommand;
-import com.homeypark.web_service.parkings.domain.model.commands.UpdateLocationCommand;
 import com.homeypark.web_service.parkings.domain.model.commands.UpdateParkingCommand;
-import com.homeypark.web_service.reservations.domain.model.entities.Reservation;
 import com.homeypark.web_service.user.domain.model.entities.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -72,7 +69,8 @@ public class Parking {
         this.location.setParking(this);
 
     }
-    public Parking updatedParking(UpdateParkingCommand command){
+
+    public void updateParking(UpdateParkingCommand command){
         this.width = command.width();
         this.length = command.length();
         this.height = command.height();
@@ -81,6 +79,30 @@ public class Parking {
         this.space = command.space();
         this.description = command.description();
 
-        return this;
+        this.location.setAddress(command.address());
+        this.location.setNumDirection(command.numDirection());
+        this.location.setStreet(command.street());
+        this.location.setDistrict(command.district());
+        this.location.setCity(command.city());
+        this.location.setLatitude(command.latitude());
+        this.location.setLongitude(command.longitude());
+
+        this.location.setParking(this);
+    }
+    @Override
+    public String toString() {
+        return "Parking{" +
+                "id=" + id +
+                ", width=" + width +
+                ", length=" + length +
+                ", height=" + height +
+                ", price=" + price +
+                ", phone='" + phone + '\'' +
+                ", space=" + space +
+                ", description='" + description + '\'' +
+                ", location=" + (location != null ? location.toString() : "null") +
+                ", schedules=" + schedules +
+                ", user=" + (user != null ? user.getId() : "null") +
+                '}';
     }
 }

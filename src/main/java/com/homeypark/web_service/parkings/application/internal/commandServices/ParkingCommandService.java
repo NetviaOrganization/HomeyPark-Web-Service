@@ -6,7 +6,6 @@ import com.homeypark.web_service.parkings.domain.model.commands.UpdateParkingCom
 import com.homeypark.web_service.parkings.domain.model.entities.Parking;
 import com.homeypark.web_service.parkings.domain.services.IParkingCommandService;
 import com.homeypark.web_service.parkings.infrastructure.repositories.jpa.IParkingRepository;
-import com.homeypark.web_service.user.domain.model.entities.User;
 import com.homeypark.web_service.user.infrastructure.repositories.jpa.IUserRepository;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,7 @@ public class ParkingCommandService implements IParkingCommandService {
         }
         parking.setUser(userOptional.get());
 
-        try{
+        try {
             var response = parkingRepository.save(parking);
             return Optional.of(response);
         } catch (Exception e) {
@@ -44,13 +43,24 @@ public class ParkingCommandService implements IParkingCommandService {
     @Override
     public Optional<Parking> handle(UpdateParkingCommand command) {
         var result = parkingRepository.findById(command.parkingId());
+
         if (result.isEmpty())
             throw new IllegalArgumentException("Parking does not exist");
-        var parkingToUpdate = result.get();
-        try{
-            var updatedParking= parkingRepository.save(parkingToUpdate.updatedParking(command));
+
+
+        try {
+            var parking = result.get();
+
+            System.out.println("[DEBUG COMMAND DATA]" + command.address() + " " + command.numDirection());
+
+            parking.updateParking(command);
+
+            System.out.println("[DEBUG ENTITY]" + parking.getLocation().getAddress() + " " + parking.getLocation().getNumDirection());
+
+            var updatedParking = parkingRepository.save(parking);
+
             return Optional.of(updatedParking);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException("Error while updating parking: " + e.getMessage());
         }
 
